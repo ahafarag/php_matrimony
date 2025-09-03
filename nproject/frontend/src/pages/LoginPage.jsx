@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { login } from '../api';
+import styles from './AuthPage.module.css';
+
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -13,9 +15,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div>
+    <div className={styles.container}>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+      <form className={styles.form} onSubmit={handleSubmit}>
+
         <input
           placeholder="Username or Email"
           value={username}

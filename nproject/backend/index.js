@@ -6,7 +6,6 @@ const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
 
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -39,7 +38,6 @@ async function loadResets() {
 async function saveResets(tokens) {
   await fs.writeJson(RESETS_FILE, tokens);
 }
-
 
 function generateMemberId(username) {
   const prefix = username.slice(0, 2).toUpperCase();
@@ -91,7 +89,6 @@ app.post('/api/register', async (req, res) => {
   await saveUsers(users);
 
   const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
-
   res.json({ token });
 });
 
