@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { login } from '../api';
 import styles from './AuthPage.module.css';
 
+
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -17,6 +18,7 @@ export default function LoginPage() {
     <div className={styles.container}>
       <h2>Login</h2>
       <form className={styles.form} onSubmit={handleSubmit}>
+
         <input
           placeholder="Username or Email"
           value={username}

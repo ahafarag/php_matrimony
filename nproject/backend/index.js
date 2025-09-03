@@ -12,6 +12,7 @@ app.use(express.json());
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 const RESETS_FILE = path.join(__dirname, 'resets.json');
+
 const JWT_SECRET = process.env.JWT_SECRET || 'secret-key';
 
 async function loadUsers() {
@@ -105,6 +106,7 @@ app.post('/api/login', async (req, res) => {
       .status(403)
       .json({ error: 'You are banned from this application. Please contact administrator.' });
   }
+
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
     return res.status(401).json({ error: 'Invalid credentials' });

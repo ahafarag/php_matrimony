@@ -10,6 +10,7 @@ export default function LandingPage() {
       <nav className={styles.nav}>
         <Link to="/login">Login</Link>
         <Link to="/register">Register</Link>
+
       </nav>
     </div>
   );

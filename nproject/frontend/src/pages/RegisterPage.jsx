@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { register } from '../api';
 import styles from './AuthPage.module.css';
 
+
 export default function RegisterPage() {
   const [form, setForm] = useState({
     firstname: '',
@@ -26,6 +27,7 @@ export default function RegisterPage() {
     <div className={styles.container}>
       <h2>Register</h2>
       <form className={styles.form} onSubmit={handleSubmit}>
+
         <input name="firstname" placeholder="First Name" value={form.firstname} onChange={handleChange} />
         <input name="lastname" placeholder="Last Name" value={form.lastname} onChange={handleChange} />
         <input name="username" placeholder="Username" value={form.username} onChange={handleChange} />

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { forgotPassword, resetPassword } from '../api';
 import styles from './AuthPage.module.css';
 
+
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
@@ -29,11 +30,13 @@ export default function ResetPasswordPage() {
     <div className={styles.container}>
       <h2>Reset Password</h2>
       <form className={styles.form} onSubmit={handleEmail}>
+
         <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
         <button type="submit">Send Reset Link</button>
       </form>
       {token && (
         <form className={styles.form} onSubmit={handleReset}>
+
           <input placeholder="Token" value={token} onChange={e => setToken(e.target.value)} />
           <input type="password" placeholder="New Password" value={password} onChange={e => setPassword(e.target.value)} />
           <button type="submit">Reset Password</button>
