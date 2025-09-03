@@ -6,12 +6,14 @@ const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 const RESETS_FILE = path.join(__dirname, 'resets.json');
+
 const JWT_SECRET = process.env.JWT_SECRET || 'secret-key';
 
 async function loadUsers() {
@@ -37,6 +39,7 @@ async function loadResets() {
 async function saveResets(tokens) {
   await fs.writeJson(RESETS_FILE, tokens);
 }
+
 
 function generateMemberId(username) {
   const prefix = username.slice(0, 2).toUpperCase();
@@ -88,6 +91,7 @@ app.post('/api/register', async (req, res) => {
   await saveUsers(users);
 
   const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
+
   res.json({ token });
 });
 
@@ -105,6 +109,7 @@ app.post('/api/login', async (req, res) => {
       .status(403)
       .json({ error: 'You are banned from this application. Please contact administrator.' });
   }
+
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
     return res.status(401).json({ error: 'Invalid credentials' });
