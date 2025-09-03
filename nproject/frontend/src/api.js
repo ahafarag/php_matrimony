@@ -26,3 +26,22 @@ export async function getMe(token) {
   });
   return res.json();
 }
+
+export async function forgotPassword(email) {
+  const res = await fetch(`${API_URL}/forgot`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+  return res.json();
+}
+
+export async function resetPassword(token, password) {
+  const res = await fetch(`${API_URL}/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, password })
+  });
+  return res.json();
+}
+
