@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
+
 
 const app = express();
 app.use(cors());
@@ -24,35 +26,83 @@ async function saveUsers(users) {
   await fs.writeJson(USERS_FILE, users);
 }
 
+function generateMemberId(username) {
+  const prefix = username.slice(0, 2).toUpperCase();
+  const random = crypto.randomBytes(4).toString('hex').toUpperCase();
+  return `${prefix}${random}`;
+}
+
 app.post('/api/register', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password required' });
+  const {
+    firstname,
+    lastname,
+    username,
+    email,
+    country_code,
+    phone_code,
+    phone,
+    password,
+    sponsor
+  } = req.body;
+
+  if (!firstname || !lastname || !username || !email || !password) {
+    return res.status(400).json({ error: 'Missing required fields' });
   }
+
   const users = await loadUsers();
-  if (users.find(u => u.email === email)) {
+  if (users.find(u => u.email === email || u.username === username)) {
     return res.status(409).json({ error: 'User already exists' });
   }
+
+  const referral = users.find(u => u.username === sponsor);
   const hashed = await bcrypt.hash(password, 10);
-  const user = { id: Date.now(), email, password: hashed };
+  const user = {
+    id: Date.now(),
+    firstname,
+    lastname,
+    username,
+    email,
+    country_code,
+    phone_code,
+    phone,
+    password: hashed,
+    referral_id: referral ? referral.id : null,
+    member_id: generateMemberId(username),
+    status: 1,
+    last_login: null
+  };
+
   users.push(user);
   await saveUsers(users);
-  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
+
+  const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
+
   res.json({ token });
 });
 
 app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   const users = await loadUsers();
-  const user = users.find(u => u.email === email);
+  const user = users.find(
+    u => u.username === username || u.email === username
+  );
   if (!user) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
+  if (user.status !== 1) {
+    return res
+      .status(403)
+      .json({ error: 'You are banned from this application. Please contact administrator.' });
+  }
+
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
-  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
+  user.last_login = new Date().toISOString();
+  await saveUsers(users);
+  const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
+
   res.json({ token });
 });
 
@@ -64,7 +114,25 @@ app.get('/api/me', async (req, res) => {
   }
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    res.json({ id: payload.id, email: payload.email });
+    const users = await loadUsers();
+    const user = users.find(u => u.id === payload.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({
+      id: user.id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      username: user.username,
+      email: user.email,
+      country_code: user.country_code,
+      phone_code: user.phone_code,
+      phone: user.phone,
+      member_id: user.member_id,
+      referral_id: user.referral_id,
+      last_login: user.last_login
+    });
+
   } catch (err) {
     res.status(401).json({ error: 'Invalid token' });
   }
